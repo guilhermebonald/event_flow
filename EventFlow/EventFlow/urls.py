@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
-from main_app import views
+from main_app.views import RegisterView
 
 
 urlpatterns = [
-    path("accounts/", include("django.contrib.auth.urls")),
+    path("register/", RegisterView.as_view()),
 ]
