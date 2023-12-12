@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.urls import path, include
-from main_app.views import RegisterView
+from main_app.views import UserRegisterView, EventCreatorView
 
 
 urlpatterns = [
-    path("register/", RegisterView.as_view()),
+    path("register/", UserRegisterView.as_view()),
+    path("new_event/", EventCreatorView.as_view()),
 ]
