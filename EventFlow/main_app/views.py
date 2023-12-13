@@ -23,16 +23,19 @@ class UserRegisterView(APIView):
 
 # Create Event
 class EventCreatorView(APIView):
-    def get(self, request):
-        events = Event.objects.all()
-        serializer = EventSerializer(events, many=True)
-        return Response(serializer.data)
+    def get(self, request, event_id=None):
+        if event_id:
+            event = get_object_or_404(Event, id=event_id)
+            serializer = EventSerializer(event)
+            return Response(serializer.data)
+        else:
+            events = Event.objects.all()
+            serializer = EventSerializer(events, many=True)
+            return Response(serializer.data)
 
     def post(self, request):
         user = get_object_or_404(UserRegister, username=request.data["usuario"])
-        request.data[
-            "usuario"
-        ] = user.id  # Substitua o nome de usuário pelo ID do usuário
+        request.data["usuario"] = user.id
         serializer = EventSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
