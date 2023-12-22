@@ -1,5 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 from main_app.serializers import UserSerializer, EventSerializer
 from .models import UserRegister, Event
 from django.shortcuts import get_object_or_404
@@ -8,9 +10,16 @@ from rest_framework import status
 
 # Register User
 class UserRegisterView(APIView):
-    def get(self, request):
-        user = UserRegister.objects.all()
-        serializer = UserSerializer(user, many=True)
+    def get(self, request, username=None):
+        self.authentication_classes = [SessionAuthentication, BasicAuthentication]
+        self.permission_classes = [IsAuthenticated]
+
+        if username:
+            user = get_object_or_404(UserRegister, username=username)
+            serializer = UserSerializer(user)
+        else:
+            users = UserRegister.objects.all()
+            serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
     def post(self, request):

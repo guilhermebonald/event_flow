@@ -7,6 +7,14 @@ class UserSerializer(serializers.ModelSerializer):
         model = UserRegister
         fields = "__all__"
 
+    def create(self, validated_data):
+        user = UserRegister.objects.create_user(
+            username=validated_data["username"],
+            password=validated_data["password"],
+            # Adicione aqui outros campos conforme necessário
+        )
+        return user
+
 
 class EventSerializer(serializers.ModelSerializer):
     class Meta(object):
