@@ -10,24 +10,25 @@ from rest_framework import status
 
 # Register User
 class UserRegisterView(APIView):
-    def get(self, request, username=None):
-        self.authentication_classes = [SessionAuthentication, BasicAuthentication]
-        self.permission_classes = [IsAuthenticated]
-
-        if username:
-            user = get_object_or_404(UserRegister, username=username)
-            serializer = UserSerializer(user)
-        else:
-            users = UserRegister.objects.all()
-            serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
-
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
+
+
+class UserGetDataView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, username=None):
+        if username == request.user.username:
+            user = get_object_or_404(UserRegister, username=username)
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        else:
+            return Response({"detail": "Acesso Negado"}, status=403)
 
 
 # Create Event
