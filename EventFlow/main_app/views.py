@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 
 
-# Register User
+# User View Rules
 class UserRegisterView(APIView):
     def post(self, request):
         serializer = UserSerializer(data=request.data)
@@ -29,6 +29,16 @@ class UserGetDataView(APIView):
             return Response(serializer.data)
         else:
             return Response({"detail": "Acesso Negado"}, status=403)
+
+
+# ! Login precisa ser feito antes? Se não eu poderia apagar a conta de outra pessoa. VERIFICAR
+class UserDeleteDataView(APIView):
+    def delete(self, request, pk=None):
+        if pk == request.user.primary_key:
+            primary_key = get_object_or_404(UserSerializer, primary_key=pk)
+            primary_key.delete()
+        else:
+            return Response({"detail": "Nenhum Usuario Encontrado"}, status=403)
 
 
 # Create Event
