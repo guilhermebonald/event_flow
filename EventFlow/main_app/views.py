@@ -33,10 +33,14 @@ class UserGetDataView(APIView):
 
 # ! Login precisa ser feito antes? Se não eu poderia apagar a conta de outra pessoa. VERIFICAR
 class UserDeleteDataView(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def delete(self, request, pk=None):
-        if pk == request.user.primary_key:
-            primary_key = get_object_or_404(UserSerializer, primary_key=pk)
+        if int(pk) == request.user.id:
+            primary_key = get_object_or_404(UserRegister, id=pk)
             primary_key.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response({"detail": "Nenhum Usuario Encontrado"}, status=403)
 
