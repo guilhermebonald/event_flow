@@ -1,17 +1,19 @@
-from django.contrib import admin
 from django.urls import path, include
 from main_app.views import (
-    UserRegisterView,
-    EventCreatorView,
-    UserGetDataView,
-    UserDeleteDataView,
+    RegisterUser,
+    UpdateUser,
+    CreateEvent,
+    GetEvent,
+    GetUser,
+    DeleteUser,
 )
 
 
 urlpatterns = [
-    path("register/", UserRegisterView.as_view()),
-    path("home/<username>/", UserGetDataView.as_view()),
-    path("delete/<pk>", UserDeleteDataView.as_view()),
-    path("new_event/", EventCreatorView.as_view()),
-    path("event/<int:event_id>/", EventCreatorView.as_view()),
+    path("users/register/", RegisterUser.as_view()),
+    path("users/home/<username>/", GetUser.as_view()),
+    path("users/delete/<pk>", DeleteUser.as_view()),
+    path("users/change-user/<username>", UpdateUser.as_view()),
+    path("users/create-event/", CreateEvent.as_view()),
+    path("users/events/<int:event_id>/", GetEvent.as_view()),
 ]
