@@ -15,7 +15,11 @@ class RegisterUser(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+        else:
+            return Response(
+                {"Error": "Dados inválidos", "Details": serializer.errors},
+                status=400,
+            )
 
 
 class GetUser(APIView):
@@ -24,25 +28,43 @@ class GetUser(APIView):
 
     def get(self, request, username=None):
         if username == request.user.username:
-            user = get_object_or_404(UserModel, username=username)
-            serializer = UserSerializer(user)
-            return Response(serializer.data)
+            try:
+                user = UserModel.objects.get(username=username)
+                serializer = UserSerializer(user, data=request.data)
+                if serializer.is_valid():
+                    return Response(serializer.data)
+                else:
+                    return Response(
+                        {"Error": "Dados inválidos", "Details": serializer.errors},
+                        status=400,
+                    )
+            except UserModel.DoesNotExist:
+                return Response({"Error": "Usuário não encontrado"}, status=404)
         else:
-            return Response({"Error": "Nenhum Usuário Encontrado"}, status=403)
+            return Response({"Error": "Acesso negado"}, status=403)
 
 
-# update
 class UpdateUser(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, username=None):
-        user = get_object_or_404(UserModel, username=username)
-        serializer = UserSerializer(user, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+        if username == request.user.username:
+            try:
+                user = UserModel.objects.get(username=username)
+                serializer = UserSerializer(user, data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=201)
+                else:
+                    return Response(
+                        {"Error": "Dados inválidos", "Details": serializer.errors},
+                        status=400,
+                    )
+            except UserModel.DoesNotExist:
+                return Response({"Error": "Usuário não encontrado"}, status=404)
+        else:
+            return Response({"Error": "Acesso negado"}, status=403)
 
 
 # ! Alterar o ID pelo nome de usuario.
