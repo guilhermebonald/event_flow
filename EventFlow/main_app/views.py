@@ -31,6 +31,7 @@ class GetUser(APIView):
             return Response({"Error": "Nenhum Usuário Encontrado"}, status=403)
 
 
+# update
 class UpdateUser(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
