@@ -67,18 +67,20 @@ class UpdateUser(APIView):
             return Response({"Error": "Acesso negado"}, status=403)
 
 
-# ! Alterar o ID pelo nome de usuario.
 class DeleteUser(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, pk=None):
-        if int(pk) == request.user.id:
-            primary_key = get_object_or_404(UserModel, id=pk)
-            primary_key.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, username=None):
+        if username == request.user.username:
+            try:
+                user = UserModel.objects.get(username=username)
+                user.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            except UserModel.DoesNotExist:
+                return Response({"Error": "Usuário não encontrado"}, status=404)
         else:
-            return Response({"detail": "Nenhum Usuario Encontrado"}, status=403)
+            return Response({"detail": "Acesso negado"}, status=403)
 
 
 # * Regras de Eventos
