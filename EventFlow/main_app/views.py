@@ -84,6 +84,9 @@ class DeleteUser(APIView):
 
 
 # * Regras de Eventos
+
+
+# TODO: Modificar o tratamento de erros, e auth, dos metodos abaixo
 class CreateEvent(APIView):
     def post(self, request):
         user = get_object_or_404(UserModel, username=request.data["usuario"])
@@ -97,6 +100,41 @@ class CreateEvent(APIView):
 
 class GetEvent(APIView):
     def get(self, request, event_id=None):
+        if event_id:
+            event = get_object_or_404(EventModel, id=event_id)
+            serializer = EventSerializer(event)
+            return Response(serializer.data)
+        else:
+            events = EventModel.objects.all()
+            serializer = EventSerializer(events, many=True)
+            return Response(serializer.data)
+
+
+# ! Alterar os metodos abaixo
+class UpdateEvent(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, event_id=None):
+        # get_user = UserModel.objects.get(id=request.data["usuario"])
+        # print(get_user)
+        try:
+            event = EventModel.objects.get(id=event_id)
+            serializer = EventSerializer(event, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=201)
+            else:
+                return Response(
+                    {"Error": "Dados inválidos", "Details": serializer.errors},
+                    status=400,
+                )
+        except EventModel.DoesNotExist:
+            return Response({"Error": "Usuário não encontrado"}, status=404)
+
+
+class DeleteEvent(APIView):
+    def delete(self, request, event_id=None):
         if event_id:
             event = get_object_or_404(EventModel, id=event_id)
             serializer = EventSerializer(event)
