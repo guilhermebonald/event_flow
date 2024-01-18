@@ -10,7 +10,7 @@ class UserModel(User):
 
 
 class EventModel(models.Model):
-    usuario = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(UserModel, on_delete=models.CASCADE)
     nome = models.CharField(max_length=255)
     data = models.DateField()
     tipo = models.CharField(max_length=255)

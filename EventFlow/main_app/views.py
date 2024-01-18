@@ -86,7 +86,8 @@ class DeleteUser(APIView):
 # * Regras de Eventos
 
 
-# TODO: Modificar o tratamento de erros, e auth, dos metodos abaixo
+# ANCHOR INCREMENTAR TRATAMENTO DE ERROS.
+# FIXME ADICIONAR AUTH.
 class CreateEvent(APIView):
     def post(self, request):
         user = get_object_or_404(UserModel, username=request.data["usuario"])
@@ -98,6 +99,8 @@ class CreateEvent(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# FIXME ADICIONAR AUTH
+# ANCHOR ADICIONAR METODO PARA PUXAR TODOS EVENTOS DE DETERMINADO USUARIO
 class GetEvent(APIView):
     def get(self, request, event_id=None):
         if event_id:
@@ -110,11 +113,11 @@ class GetEvent(APIView):
             return Response(serializer.data)
 
 
-# ! Alterar os metodos abaixo
 class UpdateEvent(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
+    # FIXME COMPARAR USUARIO LIGADO AO EVENTO AO DA AUTENTICAÇÃO
     def patch(self, request, event_id=None):
         # get_user = UserModel.objects.get(id=request.data["usuario"])
         # print(get_user)
@@ -130,7 +133,7 @@ class UpdateEvent(APIView):
                     status=400,
                 )
         except EventModel.DoesNotExist:
-            return Response({"Error": "Usuário não encontrado"}, status=404)
+            return Response({"Error": "Evento não encontrado"}, status=404)
 
 
 class DeleteEvent(APIView):
