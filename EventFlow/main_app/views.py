@@ -117,23 +117,28 @@ class UpdateEvent(APIView):
     authentication_classes = [SessionAuthentication, BasicAuthentication]
     permission_classes = [IsAuthenticated]
 
-    # FIXME COMPARAR USUARIO LIGADO AO EVENTO AO DA AUTENTICAÇÃO
     def patch(self, request, event_id=None):
-        # get_user = UserModel.objects.get(id=request.data["usuario"])
-        # print(get_user)
         try:
-            event = EventModel.objects.get(id=event_id)
-            serializer = EventSerializer(event, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=201)
-            else:
-                return Response(
-                    {"Error": "Dados inválidos", "Details": serializer.errors},
-                    status=400,
-                )
-        except EventModel.DoesNotExist:
-            return Response({"Error": "Evento não encontrado"}, status=404)
+            user = UserModel.objects.get(id=request.data["user_id"])
+        except UserModel.DoesNotExist:
+            return Response({"Error": "Usuário não encontrado"}, status=404)
+
+        if str(user) == request.user.username:
+            try:
+                event = EventModel.objects.get(id=event_id)
+                serializer = EventSerializer(event, data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=201)
+                else:
+                    return Response(
+                        {"Error": "Dados inválidos", "Details": serializer.errors},
+                        status=400,
+                    )
+            except EventModel.DoesNotExist:
+                return Response({"Error": "Evento não encontrado"}, status=404)
+        else:
+            return Response({"detail": "Acesso negado"}, status=403)
 
 
 class DeleteEvent(APIView):

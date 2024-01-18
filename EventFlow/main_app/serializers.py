@@ -3,7 +3,7 @@ from .models import UserModel, EventModel
 
 
 class UserSerializer(serializers.ModelSerializer):
-    # Necessario ter os campos username e password com "required=False" para que no metodo update não tenha que inserir senha e login no body.
+    # "required=False" para que no metodo não obrigue passar todos os campos na req.
     username = serializers.CharField(required=False)
     password = serializers.CharField(required=False, write_only=True)
 
@@ -28,7 +28,12 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    # usuario = serializers.CharField(required=True)
+    # "required=False" para que no metodo não obrigue passar todos os campos na req.
+    nome = serializers.CharField(required=False)
+    data = serializers.DateField(required=False)
+    tipo = serializers.CharField(required=False)
+    presenca = serializers.CharField(required=False)
+    comentarios = serializers.CharField(required=False)
 
     class Meta(object):
         model = EventModel
