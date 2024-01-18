@@ -99,9 +99,13 @@ class CreateEvent(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# FIXME ADICIONAR AUTH
+# FIXME CRIAR VALIDAÇÃO ENTRE USUARIO LOGADO E CRIADOR DO EVENTO.
 # ANCHOR ADICIONAR METODO PARA PUXAR TODOS EVENTOS DE DETERMINADO USUARIO
+# ANCHOR ADICIONAR TRATAMENTO DE ERROS
 class GetEvent(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, event_id=None):
         if event_id:
             event = get_object_or_404(EventModel, id=event_id)
@@ -141,6 +145,8 @@ class UpdateEvent(APIView):
             return Response({"detail": "Acesso negado"}, status=403)
 
 
+# FIXME PRECISA SER ADICIONADO A CAMADA DE AUTH.
+# FIXME FAZER A VALIDAÇÃO ENTRE USUARIO LOGADO E USUARIO CRIADOR DO EVENTO
 class DeleteEvent(APIView):
     def delete(self, request, event_id=None):
         if event_id:
