@@ -99,18 +99,23 @@ class CreateEvent(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# FIXME CRIAR VALIDAÇÃO ENTRE USUARIO LOGADO E CRIADOR DO EVENTO.
-# ANCHOR ADICIONAR METODO PARA PUXAR TODOS EVENTOS DE DETERMINADO USUARIO
-# ANCHOR ADICIONAR TRATAMENTO DE ERROS
+# FIXME PRECISA RETORNAR O EVENTO PELO ID OU SE NÃO RETORNAR TODOS OS EVENTOS. TRATA ERROS AQUI.
 class GetEvent(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
-
     def get(self, request, event_id=None):
         if event_id:
-            event = get_object_or_404(EventModel, id=event_id)
-            serializer = EventSerializer(event)
-            return Response(serializer.data)
+            try:
+                event = EventModel.objects.get(id=event_id)
+                serializer = EventSerializer(event, data=request.data)
+                if serializer.is_valid():
+                    return Response(serializer.data)
+                else:
+                    return Response(
+                        {"Error": "Dados inválidos", "Details": serializer.errors},
+                        status=400,
+                    )
+
+            except EventModel.DoesNotExist:
+                return Response({"Error": "Evento não encontrado"}, status=404)
         else:
             events = EventModel.objects.all()
             serializer = EventSerializer(events, many=True)
@@ -145,7 +150,7 @@ class UpdateEvent(APIView):
             return Response({"detail": "Acesso negado"}, status=403)
 
 
-# FIXME PRECISA SER ADICIONADO A CAMADA DE AUTH.
+# FIXME PRECISA SER ADICIONADO A CAMADA DE AUTENTICAÇÃO.
 # FIXME FAZER A VALIDAÇÃO ENTRE USUARIO LOGADO E USUARIO CRIADOR DO EVENTO
 class DeleteEvent(APIView):
     def delete(self, request, event_id=None):
