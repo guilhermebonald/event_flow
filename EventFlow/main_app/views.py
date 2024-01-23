@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
-from main_app.serializers import UserSerializer, EventSerializer
+from main_app.serializers import UserSerializer, EventSerializer, EventUpdateSerializer
 from .models import UserModel, EventModel
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -99,7 +99,7 @@ class CreateEvent(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# FIXME PRECISA RETORNAR O EVENTO PELO ID OU SE NÃO RETORNAR TODOS OS EVENTOS. TRATA ERROS AQUI.
+# FIXME PRECISA RETORNAR O EVENTO PELO ID OU SE NÃO RETORNAR TODOS OS EVENTOS. TRATAR ERROS AQUI.
 class GetEvent(APIView):
     def get(self, request, event_id=None):
         if event_id:
@@ -117,9 +117,7 @@ class GetEvent(APIView):
             except EventModel.DoesNotExist:
                 return Response({"Error": "Evento não encontrado"}, status=404)
         else:
-            events = EventModel.objects.all()
-            serializer = EventSerializer(events, many=True)
-            return Response(serializer.data)
+            return Response({"Error": "Id não encontrado"}, status=400)
 
 
 class UpdateEvent(APIView):
@@ -135,7 +133,7 @@ class UpdateEvent(APIView):
         if str(user) == request.user.username:
             try:
                 event = EventModel.objects.get(id=event_id)
-                serializer = EventSerializer(event, data=request.data)
+                serializer = EventUpdateSerializer(event, data=request.data)
                 if serializer.is_valid():
                     serializer.save()
                     return Response(serializer.data, status=201)
