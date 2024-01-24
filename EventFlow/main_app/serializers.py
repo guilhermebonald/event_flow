@@ -11,6 +11,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = UserModel
         fields = "__all__"
 
+    # Create User
     def create(self, validated_data):
         user = UserModel.objects.create_user(
             username=validated_data["username"],

@@ -99,25 +99,25 @@ class CreateEvent(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# FIXME PRECISA RETORNAR O EVENTO PELO ID OU SE NÃO RETORNAR TODOS OS EVENTOS. TRATAR ERROS AQUI.
 class GetEvent(APIView):
     def get(self, request, event_id=None):
-        if event_id:
-            try:
-                event = EventModel.objects.get(id=event_id)
-                serializer = EventSerializer(event, data=request.data)
-                if serializer.is_valid():
-                    return Response(serializer.data)
-                else:
-                    return Response(
-                        {"Error": "Dados inválidos", "Details": serializer.errors},
-                        status=400,
-                    )
+        try:
+            event = EventModel.objects.get(id=event_id)
+            serializer = EventSerializer(event, data=request.data)
+            if serializer.is_valid():
+                return Response(serializer.data)
+            else:
+                return Response(
+                    {"Error": "Dados inválidos", "Details": serializer.errors},
+                    status=400,
+                )
 
-            except EventModel.DoesNotExist:
-                return Response({"Error": "Evento não encontrado"}, status=404)
-        else:
-            return Response({"Error": "Id não encontrado"}, status=400)
+        except EventModel.DoesNotExist:
+            return Response({"Error": "Evento não encontrado"}, status=404)
+
+
+class GetAllEvent(APIView):
+    pass
 
 
 class UpdateEvent(APIView):
