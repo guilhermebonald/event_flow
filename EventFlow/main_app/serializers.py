@@ -29,22 +29,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class EventSerializer(serializers.ModelSerializer):
-    user_id = serializers.CharField(required=False)
-    nome = serializers.CharField(required=False)
-    data = serializers.DateField(required=False)
-    tipo = serializers.CharField(required=False)
-    presenca = serializers.CharField(required=False)
-    comentarios = serializers.CharField(required=False)
-
     class Meta(object):
         model = EventModel
         fields = "__all__"
-
-    def update(self, instance, validated_data):
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance
 
 
 class EventUpdateSerializer(serializers.ModelSerializer):

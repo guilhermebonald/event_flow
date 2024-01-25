@@ -89,9 +89,9 @@ class DeleteUser(APIView):
 # ANCHOR INCREMENTAR TRATAMENTO DE ERROS.
 # FIXME ADICIONAR AUTH.
 class CreateEvent(APIView):
-    def post(self, request):
-        user = get_object_or_404(UserModel, username=request.data["usuario"])
-        request.data["usuario"] = user.id
+    def post(self, request, username):
+        user = UserModel.objects.get(username=username)
+        request.data["user_id"] = user
         serializer = EventSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
