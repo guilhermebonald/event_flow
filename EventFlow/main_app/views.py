@@ -86,17 +86,26 @@ class DeleteUser(APIView):
 # * Regras de Eventos
 
 
-# ANCHOR INCREMENTAR TRATAMENTO DE ERROS.
-# FIXME ADICIONAR AUTH.
+# ANCHOR TENTAR TIRAR A NECESSIDADE DE TER QUE PASSAR "USER_ID" NO BODY DA REQUISIÇÃO
 class CreateEvent(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, username):
-        user = UserModel.objects.get(username=username)
-        request.data["user_id"] = user
-        serializer = EventSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if request.user.username == username:
+            try:
+                user = UserModel.objects.get(username=username)
+            except UserModel.DoesNotExist:
+                return Response({"Error": "Usuario não encontrado"}, status=404)
+
+            request.data["user_id"] = user
+            serializer = EventSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({"detail": "Acesso negado"}, status=403)
 
 
 class GetEvent(APIView):
