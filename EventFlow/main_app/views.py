@@ -2,7 +2,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
-from main_app.serializers import UserSerializer, EventSerializer, EventUpdateSerializer
+from main_app.serializers import (
+    UserSerializer,
+    EventSerializer,
+    EventUpdateSerializer,
+    GetEventSerializer,
+)
 from .models import UserModel, EventModel
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -112,7 +117,7 @@ class GetEvent(APIView):
     def get(self, request, event_id=None):
         try:
             event = EventModel.objects.get(id=event_id)
-            serializer = EventSerializer(event, data=request.data)
+            serializer = GetEventSerializer(event, data=request.data)
             if serializer.is_valid():
                 return Response(serializer.data)
             else:
@@ -125,6 +130,7 @@ class GetEvent(APIView):
             return Response({"Error": "Evento não encontrado"}, status=404)
 
 
+# FIXME CRIAR VIEW
 class GetAllEvent(APIView):
     pass
 
@@ -157,15 +163,19 @@ class UpdateEvent(APIView):
             return Response({"detail": "Acesso negado"}, status=403)
 
 
-# FIXME PRECISA SER ADICIONADO A CAMADA DE AUTENTICAÇÃO.
-# FIXME FAZER A VALIDAÇÃO ENTRE USUARIO LOGADO E USUARIO CRIADOR DO EVENTO
 class DeleteEvent(APIView):
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def delete(self, request, event_id=None):
-        if event_id:
-            event = get_object_or_404(EventModel, id=event_id)
-            serializer = EventSerializer(event)
-            return Response(serializer.data)
+        event = EventModel.objects.get(id=event_id)
+        user_id = event.user_id
+        if str(user_id) == request.user.username:
+            try:
+                event = EventModel.objects.get(id=event_id)
+                event.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            except EventModel.DoesNotExist:
+                return Response({"Error": "Evento não encontrado"}, status=404)
         else:
-            events = EventModel.objects.all()
-            serializer = EventSerializer(events, many=True)
-            return Response(serializer.data)
+            return Response({"detail": "Acesso negado"}, status=403)

@@ -34,6 +34,16 @@ class EventSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class GetEventSerializer(serializers.ModelSerializer):
+    class Meta(object):
+        model = EventModel
+        fields = "__all__"
+        # To set "required=False" in all model instances.
+        extra_kwargs = {
+            field.name: {"required": False} for field in EventModel._meta.get_fields()
+        }
+
+
 class EventUpdateSerializer(serializers.ModelSerializer):
     """
     O serializer "user_id" foi deixado como obrigatorio, para a validação na view "UpdateEvent",
