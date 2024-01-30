@@ -1,13 +1,15 @@
-from django.urls import path, include
-from main_app.views import (
-    RegisterUser,
-    UpdateUser,
+from django.urls import path
+from event_app.views import (
     CreateEvent,
     GetEvent,
-    GetUser,
-    DeleteUser,
     UpdateEvent,
     DeleteEvent,
+)
+from main_app.views import (
+    RegisterUser,
+    GetUser,
+    UpdateUser,
+    DeleteUser,
 )
 
 
