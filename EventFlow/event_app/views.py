@@ -46,14 +46,18 @@ class GetEvent(APIView):
                     {"Error": "Dados inválidos", "Details": serializer.errors},
                     status=400,
                 )
-
         except EventModel.DoesNotExist:
             return Response({"Error": "Evento não encontrado"}, status=404)
 
 
-# FIXME CRIAR VIEW
 class GetAllEvent(APIView):
-    pass
+    def get(self, request):
+        try:
+            event = EventModel.objects.all()
+            serializer = GetEventSerializer(event, many=True)
+            return Response(serializer.data)
+        except EventModel.DoesNotExist:
+            return Response({"Error": "Evento não encontrado"}, status=404)
 
 
 class UpdateEvent(APIView):
