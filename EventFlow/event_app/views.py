@@ -51,7 +51,7 @@ class GetEvent(APIView):
 
 
 class GetAllEvent(APIView):
-    def get(self, request):
+    def get(self):
         try:
             event = EventModel.objects.all()
             serializer = GetEventSerializer(event, many=True)
