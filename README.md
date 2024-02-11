@@ -11,12 +11,6 @@
 | :---------- | :--------- | :---------------------------------- |
 | `username` | `string` | Nome do usuário para o login. |
 | `password` | `int` | Senha do usuário para o login. |
-| `first_name` | `string` | Primeiro nome. |
-| `last_name` | `string` | Segundo nome. |
-| `email` | `string` | Email. |
-| `bio` | `string` | Biografia ou descrição. |
-| `location` | `string` | Localização do usuário. |
-| `birth_date` | `string` | Data de aniversário. |
 
 ### Criar Usuário
 
@@ -28,6 +22,12 @@
 | :---------- | :--------- | :------------------------------------------ |
 | `username` | `string` | Nome do usuário para o criação da conta. |
 | `password` | `int` | Senha do usuário para a criação da conta. |
+| `first_name` | `string` | Primeiro nome. |
+| `last_name` | `string` | Segundo nome. |
+| `email` | `string` | Email. |
+| `bio` | `string` | Biografia ou descrição. |
+| `location` | `string` | Localização do usuário. |
+| `birth_date` | `string` | Data de aniversário. |
 
 
 ### Pegar Usuário
