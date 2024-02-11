@@ -44,20 +44,23 @@ class UpdateUser(APIView):
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, username=None):
-
-        try:
-            user = UserModel.objects.get(username=username)
-            serializer = UserSerializer(user, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=201)
-            else:
-                return Response(
-                    {"Error": "Dados inválidos", "Details": serializer.errors},
-                    status=400,
-                )
-        except UserModel.DoesNotExist:
-            return Response({"Error": "Usuário não encontrado"}, status=404)
+        user = request.user
+        if str(user.username) == username:
+            try:
+                user = UserModel.objects.get(username=username)
+                serializer = UserSerializer(user, data=request.data)
+                if serializer.is_valid():
+                    serializer.save()
+                    return Response(serializer.data, status=201)
+                else:
+                    return Response(
+                        {"Error": "Dados inválidos", "Details": serializer.errors},
+                        status=400,
+                    )
+            except UserModel.DoesNotExist:
+                return Response({"Error": "Usuário não encontrado"}, status=404)
+        else:
+            return Response({"detail": "Acesso negado"}, status=403)
 
 
 class DeleteUser(APIView):
@@ -65,7 +68,8 @@ class DeleteUser(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, username=None):
-        if username == request.user.username:
+        user = request.user
+        if str(user.username) == username:
             try:
                 user = UserModel.objects.get(username=username)
                 user.delete()

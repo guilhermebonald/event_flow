@@ -19,7 +19,8 @@ class CreateEvent(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, username):
-        if request.user.username == username:
+        user = request.user
+        if str(user.username) == username:
             try:
                 user = UserModel.objects.get(username=username)
             except UserModel.DoesNotExist:
@@ -62,7 +63,7 @@ class GetAllEvent(APIView):
 
 
 class UpdateEvent(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, event_id=None):
@@ -71,7 +72,8 @@ class UpdateEvent(APIView):
         except UserModel.DoesNotExist:
             return Response({"Error": "Usuário não encontrado"}, status=404)
 
-        if str(user) == request.user.username:
+        user = request.user
+        if str(user.username) == request.user.username:
             try:
                 event = EventModel.objects.get(id=event_id)
                 serializer = EventUpdateSerializer(event, data=request.data)
@@ -90,13 +92,16 @@ class UpdateEvent(APIView):
 
 
 class DeleteEvent(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, event_id=None):
         event = EventModel.objects.get(id=event_id)
         user_id = event.user_id
-        if str(user_id) == request.user.username:
+        print(user_id)
+
+        user = request.user
+        if str(user.username) == str(user_id):
             try:
                 event = EventModel.objects.get(id=event_id)
                 event.delete()
