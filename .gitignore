@@ -3,3 +3,4 @@ __pycache__
 ef_venv
 db.sqlite3
 rest.rest
+.vscode
