@@ -31,14 +31,8 @@ class GetUser(APIView):
         if str(user.username) == username:
             try:
                 user = UserModel.objects.get(username=username)
-                serializer = UserSerializer(user, data=request.data)
-                if serializer.is_valid():
-                    return Response(serializer.data)
-                else:
-                    return Response(
-                        {"Error": "Dados inválidos", "Details": serializer.errors},
-                        status=400,
-                    )
+                serializer = UserSerializer(user)
+                return Response(serializer.data)
             except UserModel.DoesNotExist:
                 return Response({"Error": "Usuário não encontrado"}, status=404)
         else:
