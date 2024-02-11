@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from event_app.serializers import (
     EventSerializer,
@@ -14,7 +15,7 @@ from rest_framework import status
 
 # ANCHOR TENTAR TIRAR A NECESSIDADE DE TER QUE PASSAR "USER_ID" NO BODY DA REQUISIÇÃO
 class CreateEvent(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request, username):
@@ -51,7 +52,7 @@ class GetEvent(APIView):
 
 
 class GetAllEvent(APIView):
-    def get(self):
+    def get(self, request):
         try:
             event = EventModel.objects.all()
             serializer = GetEventSerializer(event, many=True)

@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from main_app.serializers import UserSerializer
 from .models import UserModel
@@ -22,11 +23,12 @@ class RegisterUser(APIView):
 
 
 class GetUser(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, username=None):
-        if username == request.user.username:
+        user = request.user
+        if str(user.username) == username:
             try:
                 user = UserModel.objects.get(username=username)
                 serializer = UserSerializer(user, data=request.data)
@@ -40,34 +42,32 @@ class GetUser(APIView):
             except UserModel.DoesNotExist:
                 return Response({"Error": "Usuário não encontrado"}, status=404)
         else:
-            return Response({"Error": "Acesso negado"}, status=403)
+            return Response({"detail": "Acesso negado"}, status=403)
 
 
 class UpdateUser(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, username=None):
-        if username == request.user.username:
-            try:
-                user = UserModel.objects.get(username=username)
-                serializer = UserSerializer(user, data=request.data)
-                if serializer.is_valid():
-                    serializer.save()
-                    return Response(serializer.data, status=201)
-                else:
-                    return Response(
-                        {"Error": "Dados inválidos", "Details": serializer.errors},
-                        status=400,
-                    )
-            except UserModel.DoesNotExist:
-                return Response({"Error": "Usuário não encontrado"}, status=404)
-        else:
-            return Response({"Error": "Acesso negado"}, status=403)
+
+        try:
+            user = UserModel.objects.get(username=username)
+            serializer = UserSerializer(user, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=201)
+            else:
+                return Response(
+                    {"Error": "Dados inválidos", "Details": serializer.errors},
+                    status=400,
+                )
+        except UserModel.DoesNotExist:
+            return Response({"Error": "Usuário não encontrado"}, status=404)
 
 
 class DeleteUser(APIView):
-    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, username=None):
