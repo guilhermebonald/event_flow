@@ -13,6 +13,9 @@ from main_app.views import (
     DeleteUser,
 )
 
+from django.conf import settings
+from django.conf.urls.static import static
+
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
@@ -31,3 +34,7 @@ urlpatterns = [
     path("users/events/update/<int:event_id>/", UpdateEvent.as_view()),
     path("users/events/delete/<int:event_id>/", DeleteEvent.as_view()),
 ]
+
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
